@@ -10,7 +10,7 @@ i2c.write(0x70, b'\xE8\xAA')
 
 # Durch die Verzögerung eines Motors kann eine durch produktionsbedingte Toleranzen unterschiedliche Drehzahl der Motoren ausgeglichen werden.
 biasR = 0 # Verzögerung des rechten Motors in Prozent
-biasL = 0 # Verzögerung des linken Motors in Prozent
+biasL = 8 # Verzögerung des linken Motors in Prozent
 
 # Die scale Funktion wird genutzt um die bias-Variablen für die Berechnung der Motorgeschwindigkeit umzuskalieren.
 def scale(num, in_min, in_max, out_min, out_max):
