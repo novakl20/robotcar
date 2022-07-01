@@ -1,34 +1,19 @@
 from microbit import button_a, sleep, pin16
 from motors import carStop, carDrive
+from speed_control import speed
 from sensors import fetchSensorData
 from LED import lightsON, lightsBreakON, lightsIndicator, indicator_warning
 from us import distance
 from utime import ticks_us, ticks_diff
 import radio
 import music
+import speech
 
 # Switch on the radio hardware
 radio.on()
 
-def speedR():
-    count = 0
-    state = fetchSensorData()['SpeedRight']
-    start = ticks_us()
-    while count != 3:
-        if fetchSensorData()['SpeedRight'] != state:
-            count += 1
-            state = fetchSensorData()['SpeedRight']
-    return ticks_diff(ticks_us(), start)
-    
-def speedL():
-    count = 0
-    state = fetchSensorData()['SpeedLeft']
-    start = ticks_us()
-    while count != 3:
-        if fetchSensorData()['SpeedLeft'] != state:
-            count += 1
-            state = fetchSensorData()['SpeedLeft']
-    return ticks_diff(ticks_us(), start)
+def obstacle():
+    return fetchSensorData()['ObstclLeft'] == '0' or fetchSensorData()['ObstclRight'] == '0' or distance() < 30
 
 def mode0():
     #fce, kdy auto zastaví, rosvítí brzdová světla a zapne výstražná světla
@@ -36,13 +21,43 @@ def mode0():
     lightsBreakON()
     lightsIndicator(indicator_warning)
 
+speedL = 150
+speedR = 150
+
 def mode1():
+    global speedL, speedR
+    
     #mod, kde auto jede dopředu a reaguje na překážku
     lightsON()
-    while fetchSensorData()['ObstclLeft'] == '0' or fetchSensorData()['ObstclRight'] == '0' or distance() < 50:
-        mode0()
-    carDrive(0, 100, 0, 100)
-    print(speedR(), speedL())
+    
+    if obstacle():
+        carStop()
+        sleep(300)
+        speech.say("Obstacle detected",  speed=92, pitch=60, throat=190, mouth=190)
+        sleep(1000)
+        for i in range(5):
+            mode0()
+        carDrive(0, 150, 150, 0)
+        sleep(1000)
+        
+    speed_value = speed()
+    
+    if speed_value != None:
+        print(speed_value)
+        '''
+        # Uprava pravého PWMka na základě otáček:
+        print("Old: PWM L: {}, PWM R: {}".format(speedL, speedR))
+
+        if speed_value[1] < speed_value[0]:
+            speedR += 5
+        elif speed_value[1] > speed_value[0]:
+            speedR -= 5
+        else:
+            pass
+        
+        print("NEW: PWM L: {}, PWM R: {}".format(speedL, speedR))
+        '''
+    carDrive(0, speedR, 0, speedL)
     
 def mode2():
     incoming = radio.receive() # Reception via radio hardware is stored in the incoming variable
@@ -77,4 +92,3 @@ def mode2():
     else: # if incoming = None, then the Joy-Car is parked.
         # This usually happens when the Joy-Car is out of range of the remote control or when the remote control is off.
         mode0()
-
