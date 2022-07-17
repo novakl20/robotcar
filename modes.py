@@ -60,7 +60,49 @@ def mode1():
     carDrive(0, speedR, 0, speedL)
     
 def mode2():
-    pass
+    '''
+    Mode for following the black line
+    Following signals from sensors are used:
+    'LineTrackerLeft'
+    'LineTrackerMiddle'
+    'LineTrackerRight'
+    '''
+
+    #control via remote
+    #TODO
+    incoming_stored = 'b'
+    incoming = radio.receive()[1]
+    if incoming == 'a':
+        incoming_stored = incoming
+    elif incoming == 'b':
+        incoming_stored = incoming
+
+    if incoming_stored == "a": # Query for the 2nd character for the functions (light and horn)
+        mode2()
+    elif incoming_stored == "b":
+        mode0()
+    else:
+        pass
+
+    #obstacle detection and evaluation
+    if obstacle():
+        carStop()
+        sleep(300)
+        speech.say("Obstacle detected",  speed=92, pitch=60, throat=190, mouth=190)
+        sleep(1000)
+        for i in range(5):
+            mode0()
+
+    #line follow logic
+    if fetchSensorData['LineTrackerMiddle']:
+        #it means, car follows the line
+        carDrive(0, 150, 0, 150)
+    elif fetchSensorData['LineTrackerLeft']:
+        #it means, car deviates to right --> car must turn left
+        carDrive(0, 100, 0, 200) #slower left motor, faster right motor
+    elif fetchSensorData['LineTrackerRight']:
+        #it means, car deviates to left --> car must turn right
+        carDrive(0, 200, 0, 100) #slower right motor, faster left motor
 
 def mode3():
     incoming = radio.receive() # Reception via radio hardware is stored in the incoming variable

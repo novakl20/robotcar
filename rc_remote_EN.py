@@ -27,7 +27,7 @@ while True:
         data0 = "0"
 
 # Assign the letters to a button and store in data1
-	if microbit.button_a.is_pressed() == 1 and microbit.button_b.is_pressed() == 0:
+    if microbit.button_a.is_pressed() == 1 and microbit.button_b.is_pressed() == 0:
         data1 = "a"
     elif microbit.button_a.is_pressed() == 0 and microbit.button_b.is_pressed() == 1:
         data1 = "b"
