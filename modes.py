@@ -60,6 +60,9 @@ def mode1():
     carDrive(0, speedR, 0, speedL)
     
 def mode2():
+    pass
+
+def mode3():
     incoming = radio.receive() # Reception via radio hardware is stored in the incoming variable
     if incoming != None: # if incoming is not None (empty) then:
         lightsON()

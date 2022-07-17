@@ -1,8 +1,7 @@
-from functools import lru_cache
 from microbit import sleep, button_a, button_b, display
 from microbit import Image
 from LED import carON
-from modes import mode0, mode1, mode2
+from modes import mode0, mode1, mode2, mode3
 
 mode = 0
 
@@ -22,7 +21,7 @@ while True:
         mode = 0
     if button_a.was_pressed() == 1:
         mode += 1
-        if mode > 2:
+        if mode > 3:
             mode = 0
     
     if mode == 0:
@@ -33,3 +32,6 @@ while True:
         
     elif mode == 2:
         mode2()
+    
+    elif mode == 3:
+        mode3()
