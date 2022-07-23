@@ -15,6 +15,9 @@ radio.on()
 def obstacle():
     return fetchSensorData()['ObstclLeft'] == '0' or fetchSensorData()['ObstclRight'] == '0' or distance() < 30
 
+def collision():
+    return speed()[0] < 5 or speed()[1] < 5
+
 def mode0():
     #fce, kdy auto zastaví, rosvítí brzdová světla a zapne výstražná světla
     carStop()
@@ -39,12 +42,18 @@ def mode1():
             mode0()
         carDrive(0, 150, 150, 0)
         sleep(1000)
-        
+    
+    if collision():
+        carStop()
+        sleep(300)
+        speech.say("Obstacle detected",  speed=92, pitch=60, throat=190, mouth=190)
+        sleep(1000)
+
     speed_value = speed()
     
+    '''
     if speed_value != None:
         print(speed_value)
-        '''
         # Uprava pravého PWMka na základě otáček:
         print("Old: PWM L: {}, PWM R: {}".format(speedL, speedR))
 
@@ -92,6 +101,12 @@ def mode2():
         sleep(1000)
         for i in range(5):
             mode0()
+
+    if collision():
+            carStop()
+            sleep(300)
+            speech.say("Obstacle detected",  speed=92, pitch=60, throat=190, mouth=190)
+            sleep(1000)
 
     #line follow logic
     if fetchSensorData['LineTrackerMiddle']:
