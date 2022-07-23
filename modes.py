@@ -18,6 +18,20 @@ def obstacle():
 def collision():
     return speed()[0] < 5 or speed()[1] < 5
 
+def obstacle_mode1():
+    carStop()
+    sleep(300)
+    speech.say("Obstacle detected",  speed=92, pitch=60, throat=190, mouth=190)
+    sleep(1000)
+    for i in range(5):
+        mode0()
+
+def collision_mode1():
+    carStop()
+    sleep(300)
+    speech.say("Obstacle detected",  speed=92, pitch=60, throat=190, mouth=190)
+    sleep(1000)
+
 def mode0():
     #fce, kdy auto zastaví, rosvítí brzdová světla a zapne výstražná světla
     carStop()
@@ -28,30 +42,23 @@ speedL = 150
 speedR = 150
 
 def mode1():
+    #mod, kde auto jede dopředu a reaguje na překážku
     global speedL, speedR
     
-    #mod, kde auto jede dopředu a reaguje na překážku
     lightsON()
     
     if obstacle():
-        carStop()
-        sleep(300)
-        speech.say("Obstacle detected",  speed=92, pitch=60, throat=190, mouth=190)
-        sleep(1000)
-        for i in range(5):
-            mode0()
+        obstacle_mode1()
         carDrive(0, 150, 150, 0)
         sleep(1000)
     
     if collision():
-        carStop()
-        sleep(300)
-        speech.say("Obstacle detected",  speed=92, pitch=60, throat=190, mouth=190)
-        sleep(1000)
+        collision_mode1()
 
+    carDrive(0, speedR, 0, speedL)
+'''
     speed_value = speed()
     
-    '''
     if speed_value != None:
         print(speed_value)
         # Uprava pravého PWMka na základě otáček:
@@ -66,7 +73,6 @@ def mode1():
         
         print("NEW: PWM L: {}, PWM R: {}".format(speedL, speedR))
         '''
-    carDrive(0, speedR, 0, speedL)
     
 def mode2():
     '''
@@ -95,18 +101,10 @@ def mode2():
 
     #obstacle detection and evaluation
     if obstacle():
-        carStop()
-        sleep(300)
-        speech.say("Obstacle detected",  speed=92, pitch=60, throat=190, mouth=190)
-        sleep(1000)
-        for i in range(5):
-            mode0()
+        obstacle_mode1()
 
     if collision():
-            carStop()
-            sleep(300)
-            speech.say("Obstacle detected",  speed=92, pitch=60, throat=190, mouth=190)
-            sleep(1000)
+        collision_mode1()
 
     #line follow logic
     if fetchSensorData['LineTrackerMiddle']:
@@ -123,6 +121,11 @@ def mode3():
     incoming = radio.receive() # Reception via radio hardware is stored in the incoming variable
     if incoming != None: # if incoming is not None (empty) then:
         lightsON()
+        
+        if obstacle():
+            music.play(music.RINGTONE)
+            lightsIndicator(indicator_warning)
+        
         if incoming[0] == "l": # Query for the 1st character for the direction
             carDrive(120, 0, 0, 120)
         elif incoming[0] == "r":
