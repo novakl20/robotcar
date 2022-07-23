@@ -37,6 +37,13 @@ def lightsOFF():
         np[x] = led_off
     np.show()
 
+def lightsWarning():
+    for x in headlights:
+        np[x] = led_red_br
+    for x in backlights:
+        np[x] = led_red_br
+    np.show()
+
 def lightsBreakON():
     for x in backlights:
         np[x] = led_red_br

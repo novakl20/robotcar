@@ -2,7 +2,7 @@ from microbit import button_a, sleep, pin16
 from motors import carStop, carDrive
 from speed_control import speed
 from sensors import fetchSensorData
-from LED import lightsON, lightsBreakON, lightsIndicator, indicator_warning
+from LED import lightsON, lightsBreakON, lightsIndicator, indicator_warning, lightsWarning
 from us import distance
 from utime import ticks_us, ticks_diff
 import radio
@@ -85,7 +85,7 @@ def mode2():
 
     #control via remote
     global incoming_stored
-    
+
     incoming = radio.receive()[1]
     if incoming == 'a':
         incoming_stored = incoming
@@ -113,12 +113,12 @@ def mode2():
 def mode3():
     incoming = radio.receive() # Reception via radio hardware is stored in the incoming variable
     if incoming != None: # if incoming is not None (empty) then:
-        lightsON()
         
         if obstacle():
-            music.play(music.RINGTONE)
-            lightsIndicator(indicator_warning)
-        
+            lightsWarning()
+        else:
+            lightsON()
+            
         if incoming[0] == "l": # Query for the 1st character for the direction
             carDrive(120, 0, 0, 120)
         elif incoming[0] == "r":
