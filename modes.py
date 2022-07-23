@@ -16,7 +16,8 @@ def obstacle():
     return fetchSensorData()['ObstclLeft'] == '0' or fetchSensorData()['ObstclRight'] == '0' or distance() < 30
 
 def collision():
-    return speed()[0] < 5 or speed()[1] < 5
+    pass
+    #return speed()[0] < 5 or speed()[1] < 5
 
 def obstacle_mode1():
     carStop()
@@ -29,7 +30,7 @@ def obstacle_mode1():
 def collision_mode1():
     carStop()
     sleep(300)
-    speech.say("Obstacle detected",  speed=92, pitch=60, throat=190, mouth=190)
+    speech.say("Collision detected",  speed=92, pitch=60, throat=190, mouth=190)
     sleep(1000)
 
 def mode0():
@@ -51,9 +52,6 @@ def mode1():
         obstacle_mode1()
         carDrive(0, 150, 150, 0)
         sleep(1000)
-    
-    if collision():
-        collision_mode1()
 
     carDrive(0, speedR, 0, speedL)
 '''
@@ -74,6 +72,8 @@ def mode1():
         print("NEW: PWM L: {}, PWM R: {}".format(speedL, speedR))
         '''
     
+incoming_stored = 'b'
+
 def mode2():
     '''
     Mode for following the black line
@@ -84,8 +84,8 @@ def mode2():
     '''
 
     #control via remote
-    #TODO
-    incoming_stored = 'b'
+    global incoming_stored
+    
     incoming = radio.receive()[1]
     if incoming == 'a':
         incoming_stored = incoming
@@ -93,29 +93,22 @@ def mode2():
         incoming_stored = incoming
 
     if incoming_stored == "a": # Query for the 2nd character for the functions (light and horn)
-        mode2()
+        #obstacle detection and evaluation
+        if obstacle():
+            obstacle_mode1()
+
+        #line follow logic
+        if fetchSensorData()['LineTrackerMiddle'] == '1':
+            #it means, car follows the line
+            carDrive(0, 150, 0, 150)
+        elif fetchSensorData()['LineTrackerLeft'] == '1':
+            #it means, car deviates to right --> car must turn left
+            carDrive(0, 100, 0, 200) #slower left motor, faster right motor
+        elif fetchSensorData()['LineTrackerRight'] == '1':
+            #it means, car deviates to left --> car must turn right
+            carDrive(0, 200, 0, 100) #slower right motor, faster left motor
     elif incoming_stored == "b":
         mode0()
-    else:
-        pass
-
-    #obstacle detection and evaluation
-    if obstacle():
-        obstacle_mode1()
-
-    if collision():
-        collision_mode1()
-
-    #line follow logic
-    if fetchSensorData['LineTrackerMiddle']:
-        #it means, car follows the line
-        carDrive(0, 150, 0, 150)
-    elif fetchSensorData['LineTrackerLeft']:
-        #it means, car deviates to right --> car must turn left
-        carDrive(0, 100, 0, 200) #slower left motor, faster right motor
-    elif fetchSensorData['LineTrackerRight']:
-        #it means, car deviates to left --> car must turn right
-        carDrive(0, 200, 0, 100) #slower right motor, faster left motor
 
 def mode3():
     incoming = radio.receive() # Reception via radio hardware is stored in the incoming variable
