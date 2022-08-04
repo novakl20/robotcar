@@ -121,7 +121,7 @@ def mode3():
     
     SpeedMax = 255 # max imput Value for e-motors
     WSpeed = rSpeed * SpeedMax # imput Value for e-motors
-    WTurn = (1 - rTurn) * Speed # reduced mput Value for e-motors when turning
+    WTurn = (1 - rTurn) * WSpeed # reduced mput Value for e-motors when turning
     
     if incoming != None: # if incoming is not None (empty) then:
         
