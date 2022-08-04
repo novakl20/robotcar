@@ -49,14 +49,14 @@ while True:
     elif Absax > amax:
         px = 1
     else:
-        px = Absax/(amax-amin)
+        px = (Absax - amin)/(amax-amin)
     
     if Absay < amin:
         py = 0
     elif Absay > amax:
         py = 1
     else:
-        py = Absax/(amax-amin)
+        py = (Absay - amin)/(amax-amin)
 
 # Assign the letters to a button and store in data1
     if microbit.button_a.is_pressed() == 1 and microbit.button_b.is_pressed() == 0:
